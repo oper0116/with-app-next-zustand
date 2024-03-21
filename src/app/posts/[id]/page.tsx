@@ -1,12 +1,11 @@
-import { dehydrate, useQuery } from "@tanstack/react-query";
-import { Metadata } from "next";
-import { unstable_cache } from "next/cache";
-import { cookies } from "next/headers";
+import { dehydrate } from "@tanstack/react-query";
+import { Metadata, ResolvingMetadata } from "next";
 import { getHello } from "~/lib/network/hello";
 import HydrationBoundary from "~/lib/react-query/Hydration";
 import { getQueryClient } from "~/lib/react-query/getQueryClient";
 
 import HydrationTest from "./Nan";
+import { getCachedHello, prefetchHelloQuery } from "~/queries/post";
 
 type Props = {
 	params: { id: string };
@@ -26,10 +25,18 @@ type Props = {
 // 	return cacheFn(id);
 // }
 
-export default async function Page({ params }: Props) {
-	const queryClient = getQueryClient();
+export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+	const data = await getCachedHello();
+	console.debug("data: ", data);
+	return {
+		title: "AAA",
+	};
+}
 
-	await queryClient.prefetchQuery({ queryKey: ["hydrate-hello"], queryFn: getHello });
+export default async function Page({ params }: Props) {
+	console.debug("Posts Page");
+	const queryClient = getQueryClient();
+	await prefetchHelloQuery(queryClient);
 	const dehydratedState = dehydrate(queryClient);
 
 	return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { PropsWithChildren } from "react";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
@@ -13,7 +13,7 @@ const Provider = ({ children }: PropsWithChildren) => {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<ReactQueryStreamedHydration>{children}</ReactQueryStreamedHydration>
-			{/* <ReactQueryDevtools initialIsOpen={false} /> */}
+			<ReactQueryDevtools initialIsOpen={false} />
 		</QueryClientProvider>
 	);
 };

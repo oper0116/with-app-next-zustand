@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import prisma from "~/lib/prisma";
 
 export async function GET(request: Request, { params }: { params: { slug: string } }) {
-	const prisma = new PrismaClient();
 	const { slug } = params;
 
 	const post = await prisma.post.findUnique({ where: { id: Number(slug) } });
@@ -15,9 +15,6 @@ export async function GET(request: Request, { params }: { params: { slug: string
 }
 
 export async function POST(request: Request) {
-	console.debug("request: ", request);
-
-	const prisma = new PrismaClient();
 	const params = {
 		title: "타이틀1",
 		content: "콘텐츠1",

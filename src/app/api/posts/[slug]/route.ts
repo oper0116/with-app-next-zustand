@@ -6,7 +6,6 @@ export async function GET(request: Request, { params }: { params: { slug: string
 	const { slug } = params;
 
 	const post = await prisma.post.findUnique({ where: { id: Number(slug) } });
-
 	if (!post) {
 		return NextResponse.json({ resultCode: "404", message: "데이터를 찾을수 없습니다." });
 	}

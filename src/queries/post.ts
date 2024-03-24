@@ -1,45 +1,31 @@
-import { QueryClient, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { unstable_cache } from "next/cache";
-import { cookies } from "next/headers";
-import { getQueryClient } from "~/lib/react-query/getQueryClient";
 
-const getBaseUrl = () => {
-	if (typeof window === "undefined") {
-		return `http://localhost:3000`;
-	}
+import { getBaseUrl } from "~/lib/fetch";
 
-	return ``;
+const postKeys = {
+	basic: ["posts"] as const,
+	lists: () => [...postKeys.basic, "list"] as const,
+	list: () => [...postKeys.lists(), {}] as const,
+	details: () => [...postKeys.basic, "detail"] as const,
+	detail: (id: number) => [...postKeys.details(), id] as const,
+	insert: () => [...postKeys.basic, "insert"] as const,
 };
 
-export async function getHello() {
-	const res = await fetch(`${getBaseUrl()}${"/api/hello"}`, { cache: "no-store" });
-	return res.json();
-}
-
-export async function getCachedHello() {
-	const cacheFn = unstable_cache(async () => getHello(), ["hello"], {
-		revalidate: 30000,
-	});
-	return cacheFn();
-}
-
-export const useHelloQuery = () => {
-	return useQuery({ queryKey: ["hydrate-hello"], queryFn: getHello });
-};
-
-export const prefetchHelloQuery = async (queryClient: QueryClient) => {
-	return queryClient.prefetchQuery({ queryKey: ["hydrate-hello"], queryFn: getCachedHello });
+// http://localhost:3000/api/posts
+export const getPosts = async () => {
+	const res = await fetch(`${getBaseUrl()}${`/api/posts`}`, { cache: "no-store" });
+	const data = await res.json();
+	return data;
 };
 
 export const getPostById = async ({ id }: { id: string }) => {
 	const params = {};
-
 	const res = await fetch(`${getBaseUrl()}${`/api/posts/${id}`}`);
-	return res.json();
-	// const res = await fetch(`${getBaseUrl()}${"/api/posts"}`, { method: "post", headers: { "content-Type": "application/json", body: JSON.stringify() } });
+	return await res.json();
 };
 
-export const insertPost = async () => {
+export const insertPost = async ({}: { title: string; content: string; published: boolean; authorId?: number }) => {
 	const params = {
 		title: "타이틀1",
 		content: "콘텐츠1",
@@ -49,5 +35,30 @@ export const insertPost = async () => {
 	};
 	const res = await fetch(`${getBaseUrl()}${"/api/posts"}`, { method: "post", headers: { "content-Type": "application/json", body: JSON.stringify(params) } });
 
-	return res;
+	return await res.json();
+};
+
+export async function getCachedPosts() {
+	const cacheFn = unstable_cache(async () => getPosts(), [...postKeys.lists()], {
+		revalidate: 30000,
+	});
+	return cacheFn();
+}
+
+export const prefetchPostsQuery = (queryClient: QueryClient) => {
+	return queryClient.prefetchQuery({ queryKey: [...postKeys.lists()], queryFn: getCachedPosts });
+};
+
+export const usePostsQuery = () => {
+	return useQuery({
+		queryKey: [...postKeys.lists()],
+		queryFn: getPosts,
+	});
+};
+
+export const usePostMutationQuery = () => {
+	return useMutation({
+		mutationKey: [postKeys.insert],
+		mutationFn: insertPost,
+	});
 };

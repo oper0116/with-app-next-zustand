@@ -1,10 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getHello } from "~/lib/network/hello";
+import { usePostsQuery } from "~/queries/post";
 
 const HydrationTest = () => {
-	const { data } = useQuery({ queryKey: ["hydrate-hello"], queryFn: getHello });
+	const { data } = usePostsQuery();
 
 	return <>{JSON.stringify(data)}</>;
 };

@@ -1,11 +1,10 @@
 import { dehydrate } from "@tanstack/react-query";
 import { Metadata, ResolvingMetadata } from "next";
-import { getHello } from "~/lib/network/hello";
 import HydrationBoundary from "~/lib/react-query/Hydration";
 import { getQueryClient } from "~/lib/react-query/getQueryClient";
 
 import HydrationTest from "./Nan";
-import { getCachedHello, prefetchHelloQuery } from "~/queries/post";
+import { prefetchPostsQuery } from "~/queries/post";
 
 type Props = {
 	params: { id: string };
@@ -26,19 +25,17 @@ type Props = {
 // }
 
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
-	const data = await getCachedHello();
-	console.debug("data: ", data);
+	// const data = await getCachedHello();
+	// console.debug("data: ", data);
 	return {
 		title: "AAA",
 	};
 }
 
 export default async function Page({ params }: Props) {
-	console.debug("Posts Page");
 	const queryClient = getQueryClient();
-	await prefetchHelloQuery(queryClient);
+	await prefetchPostsQuery(queryClient);
 	const dehydratedState = dehydrate(queryClient);
-
 	return (
 		<HydrationBoundary state={dehydratedState}>
 			<>

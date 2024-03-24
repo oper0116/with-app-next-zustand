@@ -1,7 +1,7 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { unstable_cache } from "next/cache";
 
-import { getBaseUrl } from "~/lib/fetch";
+import { fetchGet, getBaseUrl } from "~/lib/fetch";
 
 const postKeys = {
 	basic: ["posts"] as const,
@@ -14,14 +14,13 @@ const postKeys = {
 
 // http://localhost:3000/api/posts
 export const getPosts = async () => {
-	const res = await fetch(`${getBaseUrl()}${`/api/posts`}`, { cache: "no-store" });
+	const res = await fetchGet(`/api/posts`);
 	const data = await res.json();
 	return data;
 };
 
 export const getPostById = async ({ id }: { id: string }) => {
-	const params = {};
-	const res = await fetch(`${getBaseUrl()}${`/api/posts/${id}`}`);
+	const res = await fetchGet(`/api/posts/${id}`);
 	return await res.json();
 };
 

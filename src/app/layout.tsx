@@ -18,11 +18,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<ReactQueryProvider>
-				{/* <StoreProvider> */}
-				<body className={inter.className}>{children}</body>
-				{/* </StoreProvider> */}
-			</ReactQueryProvider>
+			<body className={inter.className}>
+				<ReactQueryProvider>
+					{/* <StoreProvider> */}
+					{children}
+					{/* </StoreProvider> */}
+				</ReactQueryProvider>
+			</body>
 		</html>
 	);
 }
